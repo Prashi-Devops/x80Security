@@ -1,0 +1,95 @@
+service: aws-api-lambda-databse-aurora
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  timeout: 300
+  iamRoleStatements:
+    -  Effect: "Allow"
+       Action:
+         - "rds:AddTagsToResource"
+         - "secretsmanager:*"
+         - "logs:PutLogEvents"
+         - "logs:CreateLogStream"
+         - "rds:DescribeDBClusters"
+         - "rds-data:ExecuteStatement"
+         - "rds:CreateDBCluster"
+         - "rds:deleteDBCluster"
+       Resource: 
+         - "*"
+         - "arn:aws:logs:us-east-1:952632285402:log-group:/aws/lambda/*:*"
+
+package:
+  exclude:
+    - 'node_modules/**'
+    
+functions:
+  createcluster:
+    handler: createcluster.handler
+    events:
+      - http: 
+          method: POST 
+          path: createDatabase
+          integration: lambda
+          response:
+            template: ''
+            statusCodes:
+              200:
+                pattern: ''
+    name: 2001-createDatabase
+    environment: 
+      enginetype: aurora-postgresql
+      engineversion: 12.6
+      portnumber: 3306
+  deletecluster:
+    handler: deletecluster.handler
+    events:
+      - http: 
+          method: DELETE
+          path: deleteDatabase
+          integration: lambda
+          response:
+            template: ''
+            statusCodes:
+              200:
+                pattern: ''
+    name: 2001-deleteDatabase
+  create:
+    handler: create.handler
+    events:
+      - http: 
+          method: POST 
+          path: upsertTable
+          integration: lambda
+          response:
+            template: ''
+            statusCodes:
+              200:
+                pattern: ''
+    name: 2001-upsertTable
+  delete:
+    handler: delete.handler
+    events:
+      - http: 
+          method: DELETE 
+          path: deleteTable
+          integration: lambda
+          response:
+            template: ''
+            statusCodes:
+              200:
+                pattern: ''
+    name: 2001-deleteTable
+  read:
+    handler: read.handler
+    events:
+      - http: 
+          method: GET 
+          path: readTable
+          integration: lambda
+          response:
+            template: ''
+            statusCodes:
+              200:
+                pattern: ''
+    name: 2001-getTabledetails
